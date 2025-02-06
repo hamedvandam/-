@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدم حياة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ffcccc, #ff9999);
+            text-align: center;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: #ff6666;
+            color: white;
+            padding: 10px 0;
+        }
+
+        .logo img {
+            width: 100px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        form {
+            margin: 20px auto;
+            max-width: 90%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+            text-align: left;
+        }
+
+        form input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        form button {
+            background: #ff6666;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        form button:hover {
+            background: #ff3333;
+        }
+
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        table th {
+            background: #ff6666;
+            color: white;
+        }
+
+        table tbody tr:nth-child(odd) {
+            background: #ffe6e6;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .actions button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #45a049;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #e53935;
+        }
+
+        .call-btn {
+            background: #007BFF;
+            color: white;
+        }
+
+        .call-btn:hover {
+            background: #0056b3;
+        }
+
+        .share-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .share-btn:hover {
+            background: #218838;
+        }
+
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            font-size: 17px;
+        }
+
+        .toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            th {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            tr {
+                border: 1px solid #ccc;
+                margin-bottom: 10px;
+            }
+
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+            }
+
+            td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+            }
+        }
+    </style>
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="blood.png" alt="شعار المكاوي">
+        </div>
+        <h1>الدم♡♡♡حياة</h1>
+    </header>
+    <main>
+        <form id="donorForm">
+            <input type="hidden" id="editIndex">
+            <label for="name">الاسم:</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="residence">السكن:</label>
+            <input type="text" id="residence" name="residence" required>
+            
+            <label for="age">العمر:</label>
+            <input type="number" id="age" name="age" required>
+            
+            <label for="bloodType">الفصيلة:</label>
+            <input type="text" id="bloodType" name="bloodType" required>
+            
+            <label for="phone">رقم الهاتف:</label>
+            <input type="text" id="phone" name="phone" required>
+            
+            <label for="email">البريد الإلكتروني:</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="lastDonation">اخر تبرع:</label>
+            <input type="date" id="lastDonation" name="lastDonation" required>
+            
+            <button type="button" onclick="addOrUpdateDonor()">إضافة/تعديل</button>
+        </form>
+
+        <input type="text" id="searchInput" placeholder="ابحث بالاسم أو الفصيلة..." oninput="searchDonors()">
+        
+        <table id="donorTable">
+            <thead>
+                <tr>
+                    <th>الاسم</th>
+                    <th>السكن</th>
+                    <th>العمر</th>
+                    <th>الفصيلة</th>
+                    <th>رقم الهاتف</th>
+                    <th>البريد الإلكتروني</th>
+                    <th>اخر تبرع</th>
+                    <th>موعد التبرع القادم</th>
+                    <th>إجراءات</th>
+                    <th>اتصال</th>
+                    <th>مشاركة</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- سيتم إضافة المتبرعين هنا -->
+            </tbody>
+        </table>
+
+        <div id="toast" class="toast">تمت العملية بنجاح!</div>
+
+        <!-- صفحة الإحصائيات -->
+        <section id="statistics" style="margin: 20px auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <h2>الإحصائيات</h2>
+            <div id="statsContent"></div>
+        </section>
+    </main>
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+        // تهيئة EmailJS
+        emailjs.init('YOUR_EMAILJS_USER_ID'); // استبدل بمعرف EmailJS الخاص بك
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function addOrUpdateDonor() {
+            const editIndex = document.getElementById('editIndex').value;
+            const name = document.getElementById('name').value;
+            const residence = document.getElementById('residence').value;
+            const age = document.getElementById('age').value;
+            const bloodType = document.getElementById('bloodType').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const lastDonation = document.getElementById('lastDonation').value;
+            
+            const nextDonationDate = new Date(lastDonation);
+            nextDonationDate.setMonth(nextDonationDate.getMonth() + 3);
+            const formattedNextDonation = nextDonationDate.toISOString().split('T')[0];
+            
+            const donor = {
+                name,
+                residence,
+                age,
+                bloodType,
+                phone,
+                email,
+                lastDonation,
+                nextDonation: formattedNextDonation
+            };
+            
+            let donors = JSON.parse(localStorage.getItem('donors')) || [];
+            
+            if (editIndex) {
+                donors[editIndex] = donor;
+                document.getElementById('editIndex').value = '';
+                showToast('تم التعديل بنجاح!');
+            } else {
+                donors.push(donor);
+                showToast('تمت الإضافة بنجاح!');
+            }
+
+            localStorage.setItem('donors', JSON.stringify(donors));
+            displayDonors();
+            document.getElementById('donorForm').reset();
+            updateStatistics();
+        }
+
+        function displayDonors(donors = JSON.parse(localStorage.getItem('donors')) || []) {
+            const tableBody = document.querySelector('#donorTable tbody');
+            tableBody.innerHTML = '';
+            
+            donors.forEach((donor, index) => {
+                const row = document.createElement('tr');
+                
+                Object.entries(donor).forEach(([key, value]) => {
+                    const cell = document.createElement('td');
+                    cell.textContent = value;
+                    cell.setAttribute('data-label', key);
+                    row.appendChild(cell);
+                });
+
+                const actionsCell = document.createElement('td');
+                actionsCell.className = 'actions';
+
+                const editButton = document.createElement('button');
+                editButton.textContent = 'تعديل';
+                editButton.className = 'edit-btn';
+                editButton.onclick = () => editDonor(index);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'حذف';
+                deleteButton.className = 'delete-btn';
+                deleteButton.onclick = () => deleteDonor(index);
+
+                actionsCell.appendChild(editButton);
+                actionsCell.appendChild(deleteButton);
+                row.appendChild(actionsCell);
+
+                const callCell = document.createElement('td');
+                const callButton = document.createElement('button');
+                callButton.textContent = 'اتصال';
+                callButton.className = 'call-btn';
+                callButton.onclick = () => callDonor(donor.phone);
+                callCell.appendChild(callButton);
+                row.appendChild(callCell);
+
+                const shareCell = document.createElement('td');
+                const shareButton = document.createElement('button');
+                shareButton.textContent = 'مشاركة';
+                shareButton.className = 'share-btn';
+                shareButton.onclick = () => shareDonor(donor);
+                shareCell.appendChild(shareButton);
+                row.appendChild(shareCell);
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function editDonor(index) {
+            const donors = JSON.parse(localStorage.getItem('donors')) || [];
+            const donor = donors[index];
+
+            document.getElementById('name').value = donor.name;
+            document.getElementById('residence').value = donor.residence;
+            document.getElementById('age').value = donor.age;
+            document.getElementById('bloodType').value = donor.bloodType;
+            document.getElementById('phone').value = donor.phone;
+            document.getElementById('email').value = donor.email;
+            document.getElementById('lastDonation').value = donor.lastDonation;
+            document.getElementById('editIndex').value = index;
+        }
+
+        function deleteDonor(index) {
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: 'لن تتمكن من استعادة هذا المتبرع!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'نعم، احذفه!',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let donors = JSON.parse(localStorage.getItem('donors')) || [];
+                    donors.splice(index, 1);
+                    localStorage.setItem('donors', JSON.stringify(donors));
+                    displayDonors();
+                    updateStatistics();
+                    Swal.fire('تم الحذف!', 'تم حذف المتبرع بنجاح.', 'success');
+                }
+            });
+        }
+
+        function callDonor(phone) {
+            window.location.href = `tel:${phone}`;
+        }
+
+        function shareDonor(donor) {
+            const shareText = `اسم المتبرع: ${donor.name}\nالفصيلة: ${donor.bloodType}\nرقم الهاتف: ${donor.phone}\nآخر تبرع: ${donor.lastDonation}`;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'معلومات المتبرع',
+                    text: shareText,
+                });
+            } else {
+                Swal.fire({
+                    title: 'معلومات المتبرع',
+                    text: shareText,
+                    icon: 'info',
+                });
+            }
+        }
+
+        function searchDonors() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const donors = JSON.parse(localStorage.getItem('donors')) || [];
+            const filteredDonors = donors.filter(donor => 
+                donor.name.toLowerCase().includes(searchText) || 
+                donor.bloodType.toLowerCase().includes(searchText)
+            );
+            displayDonors(filteredDonors);
+        }
+
+        function updateStatistics() {
+            const donors = JSON.parse(localStorage.getItem('donors')) || [];
+            const statsContent = document.getElementById('statsContent');
+            const bloodTypeCounts = {};
+
+            donors.forEach(donor => {
+                if (bloodTypeCounts[donor.bloodType]) {
+                    bloodTypeCounts[donor.bloodType]++;
+                } else {
+                    bloodTypeCounts[donor.bloodType] = 1;
+                }
+            });
+
+            let statsHTML = '<h3>عدد المتبرعين حسب الفصيلة:</h3>';
+            for (const [bloodType, count] of Object.entries(bloodTypeCounts)) {
+                statsHTML += `<p>${bloodType}: ${count}</p>`;
+            }
+
+            statsContent.innerHTML = statsHTML;
+        }
+
+        function sendReminder(donor) {
+            const templateParams = {
+                to_name: donor.name,
+                to_email: donor.email,
+                next_donation: donor.nextDonation,
+            };
+
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams) // استبدل بمعرفات EmailJS الخاصة بك
+                .then(() => {
+                    Swal.fire('تم الإرسال!', 'تم إرسال التذكير بنجاح.', 'success');
+                }, (error) => {
+                    Swal.fire('خطأ!', 'فشل إرسال التذكير.', 'error');
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            displayDonors();
+            updateStatistics();
+        });
+    </script>
+</body>
+</html>
